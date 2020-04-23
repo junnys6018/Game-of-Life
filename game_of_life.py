@@ -2,10 +2,25 @@ import pygame
 width = 800
 height = 600
 
-dim = 30
-cell_dim = min(width // dim, height // dim)
+dim = 100
+front_buffer = [[i == dim // 2 and j >= 5 and j <= dim - 5 for i in range(dim)] for j in range(dim)]
 
-front_buffer = [[i == 4 and j >= 3 and j <= 20 for i in range(dim)] for j in range(dim)]
+def FromFile(filename):
+    ret = []
+    with open(filename, 'r') as f:
+        dim = int(f.readline())
+        for line in f:
+            row = []
+            for char in line:
+                if char == 'x':
+                    row.append(True)
+                else:
+                    row.append(False)
+            ret.append(row)
+    return ret, dim
+front_buffer, dim = FromFile("test.txt")
+
+cell_dim = min(width // dim, height // dim)
 back_buffer = [[False for i in range(dim)] for j in range(dim)]
 
 def DrawCells(cells):
@@ -13,7 +28,7 @@ def DrawCells(cells):
     for row, x in zip(cells, range(dim)):
         for flag, y in zip(row, range(dim)):
             color = (0,0,0) if flag else (255, 255, 255)
-            pygame.draw.rect(window, color, rect.move(x * cell_dim, y * cell_dim))
+            pygame.draw.rect(window, color, rect.move(y * cell_dim, x * cell_dim))
 
 def Neighbours(cells, x, y):
     count = 0
@@ -24,7 +39,6 @@ def Neighbours(cells, x, y):
             if cells[(i + x) % dim][(j + y) % dim]:
                 count = count + 1
     return count
-
 
 def UpdateCells(current, new):
     for row, x in zip(current, range(dim)):
@@ -42,6 +56,7 @@ window.fill(pygame.Color(112, 112, 112))
 pygame.display.set_caption("Test window")
 clock = pygame.time.Clock()
 running = False
+
 while not running:
 
     for event in pygame.event.get():
@@ -55,7 +70,7 @@ while not running:
     back_buffer = temp
 
     pygame.display.update()
-    clock.tick(3)
+    clock.tick(10)
 
 pygame.quit()
 quit()
