@@ -1,10 +1,10 @@
 import pygame
 class Button:
-    font = pygame.font.SysFont(pygame.font.get_default_font(), 30)
+    font = pygame.font.Font("Consola.ttf", 25)
 
     def __init__(self, rect, name, callback):
         self.rect = rect
-        self.text = self.font.render(name, False, (0, 0, 0))
+        self.text = self.font.render(name, True, (0, 0, 0))
         self.callback = callback
 
 class GuiSystem:

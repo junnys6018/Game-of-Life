@@ -32,6 +32,8 @@ def Neighbours(cells: Grid, x: int, y: int) -> int:
         for j in range(-1, 2):
             if i == 0 and j == 0:
                 continue
+            if i + x < 0 or j + y < 0 or i + x >= dim or j + y >= dim:
+                continue
             if cells[(i + x) % dim][(j + y) % dim]:
                 count = count + 1
     return count

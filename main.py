@@ -22,16 +22,16 @@ load("toad.txt")
 window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Test window")
 clock = pygame.time.Clock()
-pygame.time.set_timer(pygame.USEREVENT, 100) # Update cells every 100 ms
+pygame.time.set_timer(pygame.USEREVENT, 50) # Update cells every 50 ms
 running = True
 
-presets = ["switch_engine.txt", "toad.txt", "triangle.txt"]
-loaders = [partial(load, preset) for preset in presets]
+presets = ["switch_engine", "toad", "gun", "triangle"]
+loaders = [partial(load, preset + ".txt") for preset in presets]
 
 gui_system = GuiSystem(window)
 
 for index, (preset, loader) in enumerate(zip(presets, loaders)):
-    gui_system.AddButton(pygame.Rect(620, index * 80 + 10, 200, 60), name=preset, callback=loader)
+    gui_system.AddButton(pygame.Rect(620, index * 80 + 10, 260, 60), name=preset, callback=loader)
 
 while running:
 
@@ -48,9 +48,13 @@ while running:
             front_buffer = back_buffer
             back_buffer = temp
 
-        gui_system.Draw()
+    if pygame.mouse.get_pressed()[0]:
+        mouse_pos = pygame.mouse.get_pos()
+        if pygame.Rect(0, 0, height, height).collidepoint(mouse_pos):
+            x, y = (i // cell_dim for i in mouse_pos)
+            front_buffer[y][x] = True
 
-        #print(event)
+    gui_system.Draw()
     pygame.display.update()
     clock.tick(60)
 
