@@ -1,29 +1,37 @@
 import pygame
 pygame.init()
-pygame.font.init()
 from logic import FromFile, DrawCells, UpdateCells
 from gui import *
+from functools import partial
 
-width = 800
+width = 900
 height = 600
 
-front_buffer, dim = FromFile("switch_engine.txt")
-back_buffer = [[False for i in range(dim)] for j in range(dim)]
-cell_dim = min(width // dim, height // dim)
+front_buffer = []
+back_buffer = []
+cell_dim = 0
 
-window = pygame.display.set_mode((800, 600))
-window.fill(pygame.Color(112, 112, 112))
+def load(path):
+    global front_buffer, back_buffer, cell_dim
+    front_buffer, dim = FromFile(path)
+    back_buffer = [[False for i in range(dim)] for j in range(dim)]
+    cell_dim = min(width // dim, height // dim)
+
+load("toad.txt")
+
+window = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Test window")
 clock = pygame.time.Clock()
 pygame.time.set_timer(pygame.USEREVENT, 100) # Update cells every 100 ms
 running = True
 
-
-def cb():
-    print("Button pressed!")
+presets = ["switch_engine.txt", "toad.txt", "triangle.txt"]
+loaders = [partial(load, preset) for preset in presets]
 
 gui_system = GuiSystem(window)
-gui_system.AddButton(pygame.Rect(600,0,80,80), name="clear", callback=cb)
+
+for index, (preset, loader) in enumerate(zip(presets, loaders)):
+    gui_system.AddButton(pygame.Rect(620, index * 80 + 10, 200, 60), name=preset, callback=loader)
 
 while running:
 
@@ -32,6 +40,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.USEREVENT:
+            window.fill(pygame.Color(112, 112, 112))
             UpdateCells(front_buffer, back_buffer)
             DrawCells(front_buffer, window, cell_dim)
             # swap buffers
