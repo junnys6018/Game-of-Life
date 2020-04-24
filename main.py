@@ -1,60 +1,78 @@
 import pygame
 pygame.init()
-from logic import FromFile, DrawCells, UpdateCells
+from logic import DrawCells, UpdateCells
 from gui import *
 from functools import partial
 
-width = 900
-height = 600
+class ApplicationState:
+    def __init__(self, file: str):
+        self.width = 900
+        self.height = 600
+        self.LoadStateFromFile(file)
 
-front_buffer = []
-back_buffer = []
-cell_dim = 0
+    def LoadStateFromFile(self, file: str):
+        self.front_buffer = []
+        with open(file, 'r') as f:
+            self.dim = int(f.readline())
+            for line in f:
+                row = []
+                for char in line:
+                    if char == 'x':
+                        row.append(True)
+                    elif char == 'o':
+                        row.append(False)
+                self.front_buffer.append(row)
 
-def load(path):
-    global front_buffer, back_buffer, cell_dim
-    front_buffer, dim = FromFile(path)
-    back_buffer = [[False for i in range(dim)] for j in range(dim)]
-    cell_dim = min(width // dim, height // dim)
+        self.back_buffer = [[False for i in range(self.dim)] for j in range(self.dim)]
+        self.cell_dim = min(self.width // self.dim, self.height // self.dim)
 
-load("toad.txt")
+    def SwapBuffers(self):
+        temp = self.front_buffer
+        self.front_buffer = self.back_buffer
+        self.back_buffer = temp
 
-window = pygame.display.set_mode((width, height))
+
+# Initialize Application related data
+app = ApplicationState("switch_engine.txt")
+
+# Initialize pygame window and clock
+window = pygame.display.set_mode((app.width, app.height))
 pygame.display.set_caption("Test window")
+
 clock = pygame.time.Clock()
 pygame.time.set_timer(pygame.USEREVENT, 50) # Update cells every 50 ms
-running = True
+
+# Initialize GUI
 
 presets = ["switch_engine", "toad", "gun", "triangle"]
-loaders = [partial(load, preset + ".txt") for preset in presets]
+loaders = [partial(app.LoadStateFromFile, preset + ".txt") for preset in presets]
 
 gui_system = GuiSystem(window)
 
 for index, (preset, loader) in enumerate(zip(presets, loaders)):
     gui_system.AddButton(pygame.Rect(620, index * 80 + 10, 260, 60), name=preset, callback=loader)
 
+# Game Loop
+running = True
 while running:
-
     for event in pygame.event.get():
         gui_system.OnEvent(event)
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.USEREVENT:
             window.fill(pygame.Color(112, 112, 112))
-            UpdateCells(front_buffer, back_buffer)
-            DrawCells(front_buffer, window, cell_dim)
-            # swap buffers
-            temp = front_buffer
-            front_buffer = back_buffer
-            back_buffer = temp
+            UpdateCells(app.front_buffer, app.back_buffer)
+            DrawCells(app.front_buffer, window, app.cell_dim)
+            app.SwapBuffers()
+
         elif event.type == pygame.MOUSEMOTION and event.buttons[0]:
             print(event)
 
     if pygame.mouse.get_pressed()[0]:
         mouse_pos = pygame.mouse.get_pos()
-        if pygame.Rect(0, 0, height, height).collidepoint(mouse_pos):
-            x, y = (i // cell_dim for i in mouse_pos)
-            front_buffer[y][x] = True
+        if pygame.Rect(0, 0, app.height, app.height).collidepoint(mouse_pos):
+            x, y = (i // app.cell_dim for i in mouse_pos)
+            app.front_buffer[y][x] = True
 
     gui_system.Draw()
     pygame.display.update()

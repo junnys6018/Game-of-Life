@@ -3,20 +3,6 @@ from typing import Tuple, List
 # Type alias
 Grid = List[List[bool]]
 
-def FromFile(filename: str) -> Tuple[Grid, int]:
-    ret = []
-    with open(filename, 'r') as f:
-        dim = int(f.readline())
-        for line in f:
-            row = []
-            for char in line:
-                if char == 'x':
-                    row.append(True)
-                elif char == 'o':
-                    row.append(False)
-            ret.append(row)
-    return ret, dim
-
 def DrawCells(cells: Grid, window: pygame.Surface, width: int):
     rect = pygame.Rect(0, 0, width - 1, width - 1)
     for x, row in enumerate(cells):
