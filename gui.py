@@ -1,8 +1,9 @@
 import pygame
+from typing import Callable
 class Button:
     font = pygame.font.Font("Consola.ttf", 25)
 
-    def __init__(self, rect, name, callback):
+    def __init__(self, rect: pygame.Rect, name: str, callback: Callable[[], None]):
         self.rect = rect
 
         # self.text is a pygame surface
@@ -17,7 +18,7 @@ class GuiSystem:
         self.buttons = []
         self.window = window
 
-    def AddButton(self, rect, *, name, callback):
+    def AddButton(self, rect: pygame.Rect, *, name: str, callback: Callable[[], None]):
         self.buttons.append(Button(rect, name, callback))
 
     def OnEvent(self, event):

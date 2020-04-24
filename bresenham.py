@@ -1,8 +1,8 @@
+from typing import Tuple, List
 # Implementation of Bresenham's Lin Drawing algorithm
 # See: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
-
-def PlotLine(x0, x1, y0, y1):
+def PlotLine(x0: int, x1: int, y0: int, y1: int) -> List[Tuple[int, int]]:
     if abs(y1 - y0) < abs(x1 - x0):
         if x0 > x1:
             return _plotShallow(x1, x0, y1, y0)

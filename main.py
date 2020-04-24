@@ -65,9 +65,7 @@ while running:
             UpdateCells(app.front_buffer, app.back_buffer)
             DrawCells(app.front_buffer, window, app.cell_dim)
             app.SwapBuffers()
-
         elif event.type == pygame.MOUSEMOTION and event.buttons[0]:
-            print(event)
             if pygame.Rect(0, 0, app.height, app.height).collidepoint(event.pos):
                 x0, y0 = (i // app.cell_dim for i in event.pos)
                 x1, y1 = (min(p + d, app.height - 1) // app.cell_dim for p, d in zip(event.pos, event.rel))
