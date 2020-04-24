@@ -3,6 +3,7 @@ pygame.init()
 from logic import DrawCells, UpdateCells
 from gui import *
 from functools import partial
+from bresenham import PlotLine
 
 class ApplicationState:
     def __init__(self, file: str):
@@ -67,12 +68,11 @@ while running:
 
         elif event.type == pygame.MOUSEMOTION and event.buttons[0]:
             print(event)
-
-    if pygame.mouse.get_pressed()[0]:
-        mouse_pos = pygame.mouse.get_pos()
-        if pygame.Rect(0, 0, app.height, app.height).collidepoint(mouse_pos):
-            x, y = (i // app.cell_dim for i in mouse_pos)
-            app.front_buffer[y][x] = True
+            if pygame.Rect(0, 0, app.height, app.height).collidepoint(event.pos):
+                x0, y0 = (i // app.cell_dim for i in event.pos)
+                x1, y1 = (min(p + d, app.height - 1) // app.cell_dim for p, d in zip(event.pos, event.rel))
+                for x, y in PlotLine(x0, x1, y0, y1):
+                    app.front_buffer[y][x] = True
 
     gui_system.Draw()
     pygame.display.update()
