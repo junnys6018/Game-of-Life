@@ -47,6 +47,8 @@ while running:
             temp = front_buffer
             front_buffer = back_buffer
             back_buffer = temp
+        elif event.type == pygame.MOUSEMOTION and event.buttons[0]:
+            print(event)
 
     if pygame.mouse.get_pressed()[0]:
         mouse_pos = pygame.mouse.get_pos()

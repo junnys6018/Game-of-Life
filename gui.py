@@ -4,6 +4,8 @@ class Button:
 
     def __init__(self, rect, name, callback):
         self.rect = rect
+
+        # self.text is a pygame surface
         self.text = self.font.render(name, True, (0, 0, 0))
         self.callback = callback
 
@@ -23,9 +25,11 @@ class GuiSystem:
             for button in self.buttons:
                 if button.rect.collidepoint(event.pos):
                     button.callback()
+                    break
     
     def Draw(self):
         for button in self.buttons:
             color = self.HOVER_COLOR if button.rect.collidepoint(pygame.mouse.get_pos()) else self.COLOR
             pygame.draw.rect(self.window, color, button.rect)
-            self.window.blit(button.text, [bc - 0.5 * fc for bc, fc in zip(button.rect.center, button.text.get_size())])
+            anchor = [bc - 0.5 * fc for bc, fc in zip(button.rect.center, button.text.get_size())]
+            self.window.blit(button.text, anchor)
